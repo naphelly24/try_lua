@@ -5,13 +5,14 @@
 
 Rocks::Rocks(const rocksdb::Options &options, const std::string &path) {
     rocksdb::Status status = rocksdb::DB::Open(options, path, &db_);
-    std::cout << "create and open rocksdb, status: " << status.code() << std::endl;
     if (!status.ok()) {
         throw std::runtime_error("Failed to open rocksdb");
     }
+    std::cout << "create and open rocksdb, path: " << path << std::endl;
 }
 
 Rocks::~Rocks() {
+    std::cout << "close rocksdb" << std::endl;
     delete db_;
     // set to nullptr, if you accidentally delete it again, 
     // nothing will happen because deleting a null pointer is a no-op in C++.
