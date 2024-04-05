@@ -107,14 +107,14 @@ void initLog() {
     spdlog::register_logger(logger);
     spdlog::set_default_logger(logger);
 
-    spdlog::set_level(spdlog::level::info);
+    spdlog::set_level(spdlog::level::debug);
 }
 
 int main() {
     initLog();
 
-    runFile();
-//    callLuaInC();
+//    runFile();
+    callLuaInC();
 //    perf();
     return 0;
 }

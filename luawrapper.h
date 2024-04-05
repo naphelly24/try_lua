@@ -12,7 +12,7 @@
 
 // Custom deleter for lua_State
 struct LuaStateDeleter {
-    void operator()(lua_State* L) const {
+    void operator()(lua_State *L) const {
         lua_close(L);
     }
 };
@@ -20,19 +20,27 @@ struct LuaStateDeleter {
 class LuaWrapper {
 public:
     LuaWrapper();
+
     ~LuaWrapper() = default;
 
     int runFile(const std::string &filename);
+
     int callLuaFib(int n);
 
     // region: bridges between Lua and C++
     static int luaGet(lua_State *L);
+
     static int luaPut(lua_State *L);
+
     static int luaDel(lua_State *L);
+   
+    static void printStack(lua_State *L, const std::string& prefix = "Print");
     // endregion
+
+
 private:
     bool checkResult(int r);
-    
+
     std::unique_ptr<Rocks> db_;
     std::unique_ptr<lua_State, LuaStateDeleter> L_;
 };
