@@ -64,7 +64,7 @@ int LuaWrapper::callLuaFib(int n) {
     printStack(L_.get(), "After pcall");
     
     int result = lua_tointeger(L_.get(), -1);
-    lua_pop(L_.get(), -1);
+    lua_pop(L_.get(), 1);
     return result;
 }
 
@@ -92,6 +92,9 @@ void LuaWrapper::printStack(lua_State *L, const std::string& prefix) {
 
 
 int LuaWrapper::luaPut(lua_State *L) {
+    // 2 in stack
+    printStack(L);
+
     // Retrieve the LuaWrapper instance from the Lua state's registry
     lua_getfield(L, LUA_REGISTRYINDEX, "LuaWrapper");
     auto *wrapper = static_cast<LuaWrapper *>(lua_touserdata(L, -1));
@@ -104,6 +107,9 @@ int LuaWrapper::luaPut(lua_State *L) {
         return luaL_error(L, "Expected 3 argument");
     }
 
+    // 3 in stack
+    printStack(L);
+
     // Get key and value args
     const char *key = lua_tostring(L, 1);
     const char *value = lua_tostring(L, 2);
@@ -112,8 +118,9 @@ int LuaWrapper::luaPut(lua_State *L) {
     wrapper->db_->put(key, value);
 
     // pop the LuaWrapper instance
-    lua_pop(L, -1);
+    lua_pop(L, 1);
 
+    // 2 in stack, lua engine will take care of the method parameters in the stack, a.k.a: key, value
     printStack(L);
 
     // Return the number of results
@@ -121,6 +128,9 @@ int LuaWrapper::luaPut(lua_State *L) {
 }
 
 int LuaWrapper::luaGet(lua_State *L) {
+    // 1 in stack: key
+    printStack(L);
+    
     // Retrieve the LuaWrapper instance from the Lua state's registry
     lua_getfield(L, LUA_REGISTRYINDEX, "LuaWrapper");
     auto *wrapper = static_cast<LuaWrapper *>(lua_touserdata(L, -1));
@@ -132,18 +142,23 @@ int LuaWrapper::luaGet(lua_State *L) {
         return luaL_error(L, "Expected 2 argument");
     }
 
+    // 2 in stack: key and LuaWrapper instance
+    printStack(L);
+
     // Get key arg
     const char *key = lua_tostring(L, -2);
 
     // Call the C++ function
     std::string value = wrapper->db_->get(key);
 
+
     // pop the LuaWrapper instance
-    lua_pop(L, -1);
+    lua_pop(L, 1);
 
     // Push result onto the Lua stack
     lua_pushstring(L, value.c_str());
 
+    // 2 in stack: key and value (method result)
     printStack(L);
 
     // Return the number of results
@@ -152,6 +167,9 @@ int LuaWrapper::luaGet(lua_State *L) {
 
 
 int LuaWrapper::luaDel(lua_State *L) {
+    // 1 in stack: key
+    printStack(L);
+    
     // Retrieve the LuaWrapper instance from the Lua state's registry
     lua_getfield(L, LUA_REGISTRYINDEX, "LuaWrapper");
     auto *wrapper = static_cast<LuaWrapper *>(lua_touserdata(L, -1));
@@ -163,6 +181,9 @@ int LuaWrapper::luaDel(lua_State *L) {
         return luaL_error(L, "Expected 2 argument");
     }
 
+    // 2 in stack: key and LuaWrapper instance
+    printStack(L);
+
     // Get key arg
     const char *key = lua_tostring(L, -2);
 
@@ -170,8 +191,9 @@ int LuaWrapper::luaDel(lua_State *L) {
     wrapper->db_->del(key);
 
     // pop the LuaWrapper instance
-    lua_pop(L, -1);
+    lua_pop(L, 1);
 
+    // 1 in stack: key
     printStack(L);
 
     // Return the number of results

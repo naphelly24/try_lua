@@ -113,8 +113,8 @@ void initLog() {
 int main() {
     initLog();
 
-//    runFile();
-    callLuaInC();
+    runFile();
+//    callLuaInC();
 //    perf();
     return 0;
 }
